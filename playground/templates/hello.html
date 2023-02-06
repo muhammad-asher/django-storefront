@@ -1,6 +1,6 @@
 <html>
-    <body>
-        {% if name %}
+<body>
+{% if name %}
 <h1>
     Hello {{ name }}
 </h1>
@@ -10,5 +10,12 @@
 </h1>
 {% endif %}
 
-    </body>
+<ul>
+    {% for product in products %}
+    <li>
+        {{product.title}} - {{product.collection}}
+    </li>
+    {% endfor %}
+</ul>
+</body>
 </html>
