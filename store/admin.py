@@ -1,12 +1,9 @@
 from django.contrib import admin, messages
-from django.contrib.contenttypes.admin import GenericTabularInline
 from django.db.models.aggregates import Count
 from django.db.models.query import QuerySet
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
 from . import models
-from tags.models import TagItem
-
 
 # Register your models here.
 class InventoryFilter(admin.SimpleListFilter):
@@ -43,11 +40,6 @@ class CollectionAdmin(admin.ModelAdmin):
             products_count=Count('product')
         )
 
-class TagInline(GenericTabularInline):
-    autocomplete_fields = ['tag']
-    min_num = 1
-    extra = 0
-    model = TagItem
 
 class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ['collection']
@@ -60,9 +52,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['collection', 'last_update', InventoryFilter]
     list_per_page = 10
     list_select_related = ['collection']
-    inlines = [TagInline]
     search_fields = ['title']
-
 
     @admin.display(ordering='inventory')
     def inventory_status(self, product):
@@ -101,6 +91,7 @@ class CustomerAdmin(admin.ModelAdmin):
         return super().get_queryset(request).annotate(
             orders_count=Count('order')
         )
+
 
 class OrderItemInline(admin.TabularInline):
     autocomplete_fields = ['product']
