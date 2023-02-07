@@ -1,9 +1,11 @@
-from django.contrib import admin,messages
+from django.contrib import admin, messages
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.db.models.aggregates import Count
 from django.db.models.query import QuerySet
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
 from . import models
+from tags.models import TagItem
 
 
 # Register your models here.
@@ -23,6 +25,7 @@ class InventoryFilter(admin.SimpleListFilter):
 
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'products_count']
+    search_fields = ['title']
 
     @admin.display(ordering='products_count')
     def products_count(self, collection):
@@ -40,14 +43,25 @@ class CollectionAdmin(admin.ModelAdmin):
             products_count=Count('product')
         )
 
+class TagInline(GenericTabularInline):
+    autocomplete_fields = ['tag']
+    min_num = 1
+    extra = 0
+    model = TagItem
 
 class ProductAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['collection']
+    prepopulated_fields = {
+        'slug': ['title']
+    }
     actions = ['clear_inventory']
     list_display = ['title', 'unit_price', 'inventory_status', 'collection']
     list_editable = ['unit_price']
-    list_filter = ['collection', 'last_update',InventoryFilter]
+    list_filter = ['collection', 'last_update', InventoryFilter]
     list_per_page = 10
     list_select_related = ['collection']
+    inlines = [TagInline]
+    search_fields = ['title']
 
 
     @admin.display(ordering='inventory')
@@ -57,15 +71,13 @@ class ProductAdmin(admin.ModelAdmin):
         return 'OK'
 
     @admin.action(description="Clear Inventory")
-    def clear_inventory(self,request,queryset):
+    def clear_inventory(self, request, queryset):
         updated_count = queryset.update(inventory=0)
         self.message_user(
             request,
             f'{updated_count} Product were successfully updated (Inventory - Low )',
             messages.SUCCESS
         )
-
-
 
 
 class CustomerAdmin(admin.ModelAdmin):
@@ -90,8 +102,17 @@ class CustomerAdmin(admin.ModelAdmin):
             orders_count=Count('order')
         )
 
+class OrderItemInline(admin.TabularInline):
+    autocomplete_fields = ['product']
+    min_num = 1
+    max_num = 10
+    model = models.OrderItem
+    extra = 0
+
 
 class OrderAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['customer']
+    inlines = [OrderItemInline]
     list_display = ['id', 'placed_at', 'customer']
 
 
