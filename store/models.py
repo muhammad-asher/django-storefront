@@ -91,6 +91,11 @@ class Order(models.Model):
         max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
 
+    class Meta:
+        permissions = [
+            ('cancel_order', 'Can Cancel Order')
+        ]
+
 
 class Address(models.Model):
     street = models.CharField(max_length=255),
