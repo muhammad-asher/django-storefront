@@ -10,12 +10,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.decorators import APIView
-from .models import Product, Collection, OrderItem, Review, Cart, CartItem, Customer
+from .models import Product, Collection, OrderItem, Review, Cart, CartItem, Customer, Order
 from .filters import ProductFilter
 from .permissions import IsAdminOrReadOnly, ViewCustomerHistoryPermission
 from .pagination import DefaultPagination
 from .serializers import ProductSerialzer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, \
-    AddCartItemSerializer, UpdateCartItemSerializer, CustomerSerializer
+    AddCartItemSerializer, UpdateCartItemSerializer, CustomerSerializer, OrderSerializer, CreateOrderSerializer
 
 
 # Create your views here.
@@ -122,6 +122,25 @@ class CustomerViewSet(ModelViewSet):
     @action(detail=True)
     def history(self, request, pk):
         return Response("ok")
+
+
+class OrderViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer
+
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Order.objects.all()
+        (customer_id, created) = Customer.objects.only('id').get_or_create(user_id=user.id)
+        Order.objects.filter(customer_id=customer_id)
 
 
 # Implemented using Generic Views
