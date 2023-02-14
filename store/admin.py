@@ -5,6 +5,7 @@ from django.utils.html import format_html, urlencode
 from django.urls import reverse
 from . import models
 
+
 # Register your models here.
 class InventoryFilter(admin.SimpleListFilter):
     title = 'inventory'
@@ -41,11 +42,22 @@ class CollectionAdmin(admin.ModelAdmin):
         )
 
 
+class ProductImageInline(admin.TabularInline):
+    model = models.ProductImage
+    readonly_fields = ['thumbnail']
+
+    def thumbnail(self, instance):
+        if instance.image.name != '':
+            return format_html(f'<img src ="{instance.image.url}" class="thumbnail">')
+        return ""
+
+
 class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ['collection']
     prepopulated_fields = {
         'slug': ['title']
     }
+    inlines = [ProductImageInline]
     actions = ['clear_inventory']
     list_display = ['title', 'unit_price', 'inventory_status', 'collection']
     list_editable = ['unit_price']
@@ -68,6 +80,11 @@ class ProductAdmin(admin.ModelAdmin):
             f'{updated_count} Product were successfully updated (Inventory - Low )',
             messages.SUCCESS
         )
+
+    class Media:
+        css = {
+            'all': ['store/styles.css']
+        }
 
 
 class CustomerAdmin(admin.ModelAdmin):
