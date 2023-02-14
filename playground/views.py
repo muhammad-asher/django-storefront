@@ -6,7 +6,8 @@ from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from store.models import Product, Collection, Order, OrderItem
 from tags.models import TagItem
-from django.core.mail import send_mail, mail_admins, BadHeaderError
+from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
+from templated_mail.mail import BaseEmailMessage
 
 
 # Create your views here.
@@ -65,7 +66,15 @@ def say_hello(request):
     #     item.unit_price = 10
     #     item.save()
     try:
-        mail_admins('subject', 'message', html_message='Training Message')
+        message = BaseEmailMessage(
+            template_name='emails/hello.html',
+            context={'name': 'Asher'}
+        )
+        message.send(['everyone@gmail.com'])
+        # message = EmailMessage('subject', 'message', 'everyone@gmail.com', ['anyone@phpstudios.com'])
+        # message.attach_file('playground/static/images/title.png')
+        # message.send()
+        # mail_admins('subject', 'message', html_message='Training Message')
         # send_mail('subject', 'message', 'anyone@phpstudios.com', ['everyone@gmail.com'])
     except BadHeaderError:
         pass
