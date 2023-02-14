@@ -6,6 +6,7 @@ from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from store.models import Product, Collection, Order, OrderItem
 from tags.models import TagItem
+from django.core.mail import send_mail, mail_admins, BadHeaderError
 
 
 # Create your views here.
@@ -63,5 +64,9 @@ def say_hello(request):
     #     item.quantity = 1
     #     item.unit_price = 10
     #     item.save()
-
+    try:
+        mail_admins('subject', 'message', html_message='Training Message')
+        # send_mail('subject', 'message', 'anyone@phpstudios.com', ['everyone@gmail.com'])
+    except BadHeaderError:
+        pass
     return render(request, 'hello.html', {'name': 'Asher Khan', 'products': list(query_set)})
