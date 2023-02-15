@@ -17,6 +17,7 @@ django-cors-headers = "*"
 django-templated-email = "*"
 redis = "*"
 celery = "*"
+flower = "*"
 
 [dev-packages]
 autopep8 = "*"
