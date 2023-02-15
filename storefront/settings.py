@@ -187,4 +187,4 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 5,
         'args': ['Hello World'],
     }
-}
+} 
