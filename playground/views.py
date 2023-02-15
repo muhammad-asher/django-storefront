@@ -8,6 +8,7 @@ from store.models import Product, Collection, Order, OrderItem
 from tags.models import TagItem
 from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
 from templated_mail.mail import BaseEmailMessage
+from .tasks import notify_customer
 
 
 # Create your views here.
@@ -84,4 +85,6 @@ def say_hello(request):
     # send_mail
     # send_mail('subject', 'message', 'anyone@phpstudios.com', ['everyone@gmail.com'])
 
+    # Celery
+    notify_customer.delay('hello')
     return render(request, 'hello.html', {'name': 'Asher Khan', 'products': list(query_set)})
