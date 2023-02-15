@@ -65,17 +65,23 @@ def say_hello(request):
     #     item.quantity = 1
     #     item.unit_price = 10
     #     item.save()
-    try:
-        message = BaseEmailMessage(
-            template_name='emails/hello.html',
-            context={'name': 'Asher'}
-        )
-        message.send(['everyone@gmail.com'])
-        # message = EmailMessage('subject', 'message', 'everyone@gmail.com', ['anyone@phpstudios.com'])
-        # message.attach_file('playground/static/images/title.png')
-        # message.send()
-        # mail_admins('subject', 'message', html_message='Training Message')
-        # send_mail('subject', 'message', 'anyone@phpstudios.com', ['everyone@gmail.com'])
-    except BadHeaderError:
-        pass
+
+    # BaseEmailMessage
+    # message = BaseEmailMessage(
+    #     template_name='emails/hello.html',
+    #     context={'name': 'Asher'}
+    # )
+    # message.send(['everyone@gmail.com'])
+
+    # EmailMessage
+    # message = EmailMessage('subject', 'message', 'everyone@gmail.com', ['anyone@phpstudios.com'])
+    # message.attach_file('playground/static/images/title.png')
+    # message.send()
+
+    # mail_admins
+    # mail_admins('subject', 'message', html_message='Training Message')
+
+    # send_mail
+    # send_mail('subject', 'message', 'anyone@phpstudios.com', ['everyone@gmail.com'])
+
     return render(request, 'hello.html', {'name': 'Asher Khan', 'products': list(query_set)})
