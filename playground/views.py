@@ -12,6 +12,7 @@ from .tasks import notify_customer
 import requests
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
+import logging
 
 
 # Create your views here.
@@ -97,6 +98,12 @@ def say_hello(request):
     # requests.get('https://httpbin.org/delay/2')
 
     # Using the Low Level Cache API
-    response = requests.get('https://httpbin.org/delay/2')
-    data = response.json()
+    logger = logging.getLogger(__name__)
+    try:
+        logger.info('Calling httpbin')
+        response = requests.get('https://httpbin.org/delay/2')
+        logger.info('Revieved the response')
+        data = response.json()
+    except requests.ConnectionError:
+        logger.critical('Httpbin is offline')
     return render(request, 'hello.html', {'name': data, 'products': list(query_set)})
