@@ -30,6 +30,10 @@ class WebsiteUser(HttpUser):
             }
         )
 
+    @task
+    def say_hello(self):
+        self.client.get('/playground/hello/ ')
+
     def on_start(self):
         response = self.client.post('/store/carts/')
         result = response.json()

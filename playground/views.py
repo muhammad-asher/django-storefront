@@ -9,10 +9,15 @@ from tags.models import TagItem
 from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
 from templated_mail.mail import BaseEmailMessage
 from .tasks import notify_customer
+import requests
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 
 
 # Create your views here.
 
+# Caching views
+@cache_page(5 * 60)
 def say_hello(request):
     # query_set = Product.objects.all()
 
@@ -86,5 +91,12 @@ def say_hello(request):
     # send_mail('subject', 'message', 'anyone@phpstudios.com', ['everyone@gmail.com'])
 
     # Celery
-    notify_customer.delay('hello')
-    return render(request, 'hello.html', {'name': 'Asher Khan', 'products': list(query_set)})
+    # notify_customer.delay('hello')
+
+    # Simulating a Slow API
+    # requests.get('https://httpbin.org/delay/2')
+
+    # Using the Low Level Cache API
+    response = requests.get('https://httpbin.org/delay/2')
+    data = response.json()
+    return render(request, 'hello.html', {'name': data, 'products': list(query_set)})
